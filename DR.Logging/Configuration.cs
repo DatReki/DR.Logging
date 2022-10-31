@@ -88,9 +88,8 @@ namespace DR.Logging
                 {
                     if (maxSize > s_absoluteMaxSize)
                         maxSize = s_absoluteMaxSize;
-                    else
-                        s_maxSize = (int)maxSize;
                 }
+                s_maxSize = (int)maxSize;
             }
             if (timeZone != null)
                 s_timeZoneInfo = timeZone;

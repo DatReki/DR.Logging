@@ -77,7 +77,7 @@ namespace DRL_Console
                 .Start(ctx =>
                 {
                     ProgressTask task = ctx.AddTask($"Writing {totalLoops} logs to file");
-                    _ = new Configuration(false, logPath, (int)ByteSize.FromKiloBytes(75).Bytes, TimeZoneInfo.Local, null);
+                    _ = new Configuration(false, logPath, (int)ByteSize.FromKiloBytes(25).Bytes, TimeZoneInfo.Local, null);
                     sw = Stopwatch.StartNew();
                     for (int count = 0; count < loops; count++)
                     {

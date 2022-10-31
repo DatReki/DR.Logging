@@ -215,7 +215,7 @@ namespace DR.Logging
             }
             catch (Exception e)
             {
-                if (e.HResult == -2147024713)
+                if (e is System.IO.IOException)
                     MoveFile(date, 1, originalPath, directory, filename, extension);
                 else
                     throw e;
