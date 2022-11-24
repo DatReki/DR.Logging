@@ -13,7 +13,7 @@ namespace DRL_Console
         static void Main(string[] args)
         {
             WriteTimeZones();
-            string logPath = GetExecutablePath("logging.json");
+            string logPath = GetExecutablePath(Path.Join("logs", "logging.json"));
 
             #region Default configuration
             Console.WriteLine($"Original:");
@@ -37,7 +37,7 @@ namespace DRL_Console
                 Fatal = "#5f5f00",
             };
 
-            _ = new Configuration(true, logPath, null, TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time"), colors);
+            _ = new Configuration(logToConsole: true, logPath: logPath, timeZone: TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time"), colors: colors);
             Log.Debug("debug test");
             Log.Trace("trace test");
             Log.Info("info test");
@@ -55,8 +55,8 @@ namespace DRL_Console
                 .Columns(new ProgressColumn[]
                 {
                     new TaskDescriptionColumn(),
-                    new ProgressBarColumn() 
-                    { 
+                    new ProgressBarColumn()
+                    {
                         RemainingStyle = new Style(Color.Grey),
                         IndeterminateStyle = new Style(Color.White),
                         CompletedStyle = new Style(Color.Green)
@@ -77,7 +77,8 @@ namespace DRL_Console
                 .Start(ctx =>
                 {
                     ProgressTask task = ctx.AddTask($"Writing {totalLoops} logs to file");
-                    _ = new Configuration(false, logPath, (int)ByteSize.FromKiloBytes(25).Bytes, TimeZoneInfo.Local, null);
+
+                    _ = new Configuration(false, logPath, (int)ByteSize.FromMegaBytes(5).Bytes, TimeZoneInfo.Local, null);
                     sw = Stopwatch.StartNew();
                     for (int count = 0; count < loops; count++)
                     {

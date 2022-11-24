@@ -14,7 +14,7 @@ namespace DR.Logging
     {
         internal static bool s_logToConsole = true;
         internal static LogFile s_logFile { get; set; } = new LogFile();
-        internal static int s_maxSize { get; set; } = 0;
+        internal static int s_maxSize { get; private set; }
         internal static TimeZoneInfo s_timeZoneInfo { get; private set; } = TimeZoneInfo.Local;
         internal static Colors s_consoleColors { get; private set; } = new Colors();
 
@@ -64,32 +64,31 @@ namespace DR.Logging
         /// <param name="timeZone">What timezone you want the application to use.</param>
         /// <param name="colors">What colors you want to show for each different log level.</param>
         /// <exception cref="Exception">Thrown when you pass invalid (HEX/RGB) colors.</exception>
-        public Configuration(bool? logToConsole, string? logPath, int? maxSize, TimeZoneInfo? timeZone, Colors? colors)
+        public Configuration(bool? logToConsole = null, string? logPath = null, int? maxSize = null, TimeZoneInfo? timeZone = null, Colors? colors = null)
         {
             if (logToConsole != null)
                 s_logToConsole = (bool)logToConsole;
             if (logPath != null)
             {
                 string dirName = Path.GetDirectoryName(logPath);
-                if (Directory.Exists(dirName))
-                    s_logFile = new LogFile()
-                    {
-                        s_full = logPath,
-                        s_directory = dirName,
-                        s_filename = Path.GetFileNameWithoutExtension(logPath),
-                        s_extension = Path.GetExtension(logPath)
-                    };
-                else
-                    throw new Errors.InvalidPathException("The path you provided does not exist!");
+                Directory.CreateDirectory(dirName);
+                s_logFile = new LogFile()
+                {
+                    s_full = logPath,
+                    s_directory = dirName,
+                    s_filename = Path.GetFileNameWithoutExtension(logPath),
+                    s_extension = Path.GetExtension(logPath)
+                };
 
                 if (maxSize == null)
-                    maxSize = s_absoluteMaxSize;
+                    s_maxSize = s_absoluteMaxSize;
                 else
                 {
-                    if (maxSize > s_absoluteMaxSize)
-                        maxSize = s_absoluteMaxSize;
+                    if (s_absoluteMaxSize > maxSize)
+                        s_maxSize = (int)maxSize;
+                    else
+                        s_maxSize = s_absoluteMaxSize;
                 }
-                s_maxSize = (int)maxSize;
             }
             if (timeZone != null)
                 s_timeZoneInfo = timeZone;

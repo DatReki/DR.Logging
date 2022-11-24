@@ -8,6 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Spectre.Console;
 using Newtonsoft.Json.Linq;
 using static DR.Logging.Configuration;
+using System.Text;
 
 namespace DR.Logging
 {
@@ -101,25 +102,26 @@ namespace DR.Logging
             if (s_logToConsole)
             {
                 string color = Core.Color.Get(level);
-                Console.Write($"[{date.ToShortDateString()} {date.ToLongTimeString()}] [");
+                string log = Markup.Escape($"[{date.ToShortDateString()} {date.ToLongTimeString()}] [") +
+                    $"[{color}]{level}[/]" +
+                    Markup.Escape($"] [{Path.GetFileName(file)}] [{method}] [{lineNumber}] {message}");
                 try
                 {
-                    // Set hex color
-                    AnsiConsole.Write(new Markup($"[{color}]{level}[/]"));
+                    // Hex color
+                    AnsiConsole.MarkupLine(log);
                 }
                 catch
                 {
                     try
                     {
-                        // Set rgb color
-                        AnsiConsole.Write(new Markup($"[rgb({color})]{level}[/]"));
+                        // RGB color
+                        AnsiConsole.MarkupLine(log.Replace(color, $"rgb({color})"));
                     }
                     catch (Exception e)
                     {
                         throw e;
                     }
                 }
-                Console.Write($"] [{Path.GetFileName(file)}] [{method}] [{lineNumber}] {message}\n");
             }
 
             Configuration.LogFile logFile = s_logFile;
@@ -134,14 +136,11 @@ namespace DR.Logging
 
                     // If file/string reached max size 
                     if (s_json.Length > s_maxSize)
-                    {
                         MoveFile(date, 0, logPath, logFile.s_directory, logFile.s_filename, logFile.s_extension);
-                    }
                 }
-                
+
                 if (!File.Exists(logPath))
                     s_json = Models.Serialize.ToJson<Models.LogFileModel>(new Models.LogFileModel());
-
 
 
                 JObject logs = JObject.Parse(s_json);
